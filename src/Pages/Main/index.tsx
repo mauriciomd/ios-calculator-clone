@@ -1,8 +1,14 @@
 import React from 'react';
-import { View } from 'react-native';
 
-// import { Container } from './styles';
+import { Container, Display, Keyboard, Result } from './styles';
 
 export default function Main() {
-  return <View />;
+  return (
+    <Container>
+      <Display>
+        <Result>0</Result>
+      </Display>
+      <Keyboard />
+    </Container>
+  );
 }
