@@ -21,4 +21,8 @@ export const Result = styled.Text`
 export const Keyboard = styled.View`
   background: #98a0ff;
   flex: 1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
 `;
