@@ -38,6 +38,7 @@ export const Keyboard = styled.View`
   flex-wrap: wrap;
   justify-content: space-around;
   align-content: space-around;
+  padding: 5px;
 `;
 
 export const LargeButton = styled.TouchableOpacity<LargeButtonPropos>`
