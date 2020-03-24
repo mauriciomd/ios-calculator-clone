@@ -17,19 +17,56 @@ import {
 } from './styles';
 
 export default function Main() {
+  const operations = {
+    add: (x: number, y: number) => x + y,
+    min: (x: number, y: number) => x - y,
+    mul: (x: number, y: number) => x * y,
+    div: (x: number, y: number) => x / y,
+  };
+
   const [result, setResult] = React.useState<string>('0');
+  const [firstOperator, setFirstOperator] = React.useState('0');
+
+  const [currentOperation, setCurrentOperation] = React.useState<string>('');
+  const [replaceView, setReplaceView] = React.useState<boolean>(false);
 
   function handleClickNumber(value: string): void {
-    if (result === '0' && value !== ',') {
+    if ((result === '0' && value !== ',') || replaceView) {
       setResult(value);
-    } else {
+      setReplaceView(false);
+    } else if (result !== 'Error') {
       const newValue = result.concat(value);
       setResult(newValue);
     }
   }
 
+  function handleOperation(operation: string): void {
+    if (result !== 'Error') {
+      setReplaceView(true);
+      setCurrentOperation(operation);
+      setFirstOperator(result);
+    }
+  }
+
+  function handleEqual(): void {
+    if (result !== 'Error') {
+      const a = Number.parseInt(firstOperator, 0);
+      setResult(a);
+      const b = Number.parseInt(result, 0);
+
+      if (currentOperation === 'div' && b === 0) {
+        setResult('Error');
+      } else {
+        const value = operations[currentOperation](a, b);
+        setResult(value);
+        setFirstOperator(value);
+      }
+    }
+  }
+
   function handleClean() {
     setResult('0');
+    setFirstOperator('0');
   }
 
   return (
@@ -48,7 +85,9 @@ export default function Main() {
         <Button color={ActionButtonColor}>
           <Text color={ActionTextColor}>%</Text>
         </Button>
-        <Button color={OperationButtonColor}>
+        <Button
+          color={OperationButtonColor}
+          onPress={() => handleOperation('div')}>
           <Text>/</Text>
         </Button>
 
@@ -70,7 +109,9 @@ export default function Main() {
           }}>
           <Text>9</Text>
         </Button>
-        <Button color={OperationButtonColor}>
+        <Button
+          color={OperationButtonColor}
+          onPress={() => handleOperation('mul')}>
           <Text>x</Text>
         </Button>
 
@@ -92,7 +133,9 @@ export default function Main() {
           }}>
           <Text>6</Text>
         </Button>
-        <Button color={OperationButtonColor}>
+        <Button
+          color={OperationButtonColor}
+          onPress={() => handleOperation('min')}>
           <Text>-</Text>
         </Button>
 
@@ -114,7 +157,9 @@ export default function Main() {
           }}>
           <Text>3</Text>
         </Button>
-        <Button color={OperationButtonColor}>
+        <Button
+          color={OperationButtonColor}
+          onPress={() => handleOperation('add')}>
           <Text>+</Text>
         </Button>
 
@@ -130,7 +175,7 @@ export default function Main() {
           }}>
           <Text>,</Text>
         </Button>
-        <Button color={OperationButtonColor}>
+        <Button color={OperationButtonColor} onPress={() => handleEqual()}>
           <Text>=</Text>
         </Button>
       </Keyboard>
