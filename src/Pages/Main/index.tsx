@@ -16,63 +16,100 @@ import {
   Text,
 } from './styles';
 
+const operations = {
+  add: (x: number, y: number) => x + y,
+  min: (x: number, y: number) => x - y,
+  mul: (x: number, y: number) => x * y,
+  div: (x: number, y: number) => x / y,
+};
+
+type CalculatorState = {
+  waitingForOperand: boolean;
+  replaceView: boolean;
+  firstOperand: number;
+  display: string;
+};
+
 export default function Main() {
-  const operations = {
-    add: (x: number, y: number) => x + y,
-    min: (x: number, y: number) => x - y,
-    mul: (x: number, y: number) => x * y,
-    div: (x: number, y: number) => x / y,
-  };
-
-  const [result, setResult] = React.useState<string>('0');
-  const [firstOperator, setFirstOperator] = React.useState('0');
-
-  const [currentOperation, setCurrentOperation] = React.useState<string>('');
-  const [replaceView, setReplaceView] = React.useState<boolean>(false);
+  const [calc, setCalc] = React.useState<CalculatorState>({
+    waitingForOperand: true,
+    replaceView: false,
+    firstOperand: 0,
+    display: '0',
+  });
+  const [operator, setOperator] = React.useState<string>('');
 
   function handleClickNumber(value: string): void {
-    if ((result === '0' && value !== ',') || replaceView) {
-      setResult(value);
-      setReplaceView(false);
-    } else if (result !== 'Error') {
-      const newValue = result.concat(value);
-      setResult(newValue);
+    if ((calc.display === '0' && value !== '.') || calc.replaceView) {
+      setCalc({
+        ...calc,
+        replaceView: false,
+        display: value,
+      });
+    } else if (calc.display !== 'Error') {
+      setCalc({
+        ...calc,
+        display: calc.display.concat(value),
+      });
     }
   }
 
-  function handleOperation(operation: string): void {
-    if (result !== 'Error') {
-      setReplaceView(true);
-      setCurrentOperation(operation);
-      setFirstOperator(result);
+  function handleOperation(op: string): void {
+    setOperator(op);
+    handleExecuteCalc();
+  }
+
+  function handleExecuteCalc(): void {
+    if (!calc.waitingForOperand) {
+      const a = calc.firstOperand;
+      const b = Number.parseFloat(calc.display);
+      const result = operations[operator](a, b);
+
+      setCalc({
+        ...calc,
+        display: result.toString(),
+        firstOperand: result,
+        replaceView: true,
+      });
+    } else {
+      setCalc({
+        ...calc,
+        firstOperand: Number.parseFloat(calc.display),
+        waitingForOperand: false,
+        replaceView: true,
+      });
     }
   }
 
   function handleEqual(): void {
-    if (result !== 'Error') {
-      const a = Number.parseInt(firstOperator, 0);
-      setResult(a);
-      const b = Number.parseInt(result, 0);
+    if (!calc.waitingForOperand) {
+      const a = calc.firstOperand;
+      const b = Number.parseFloat(calc.display);
+      const result = operations[operator](a, b);
 
-      if (currentOperation === 'div' && b === 0) {
-        setResult('Error');
-      } else {
-        const value = operations[currentOperation](a, b);
-        setResult(value);
-        setFirstOperator(value);
-      }
+      setCalc({
+        ...calc,
+        display: result.toString(),
+        firstOperand: result,
+        replaceView: true,
+        waitingForOperand: true,
+      });
     }
   }
 
   function handleClean() {
-    setResult('0');
-    setFirstOperator('0');
+    setCalc({
+      waitingForOperand: true,
+      replaceView: false,
+      firstOperand: 0,
+      display: '0',
+    });
   }
 
   return (
     <Container>
       <Display>
-        <Result>{result}</Result>
+        <Result>{calc.display}</Result>
       </Display>
 
       <Keyboard>
@@ -171,7 +208,7 @@ export default function Main() {
         </LargeButton>
         <Button
           onPress={() => {
-            handleClickNumber(',');
+            handleClickNumber('.');
           }}>
           <Text>,</Text>
         </Button>
