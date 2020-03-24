@@ -97,7 +97,16 @@ export default function Main() {
     }
   }
 
-  function handlePercent(): void { }
+  function handlePercent(): void {
+    const result = Number.parseFloat(calc.display) / 100;
+    setCalc({
+      ...calc,
+      display: result.toString(),
+      firstOperand: result,
+      replaceView: true,
+      waitingForOperand: true,
+    });
+  }
 
   function handleChangeSignal(): void {
     if (calc.display.startsWith('-')) {
@@ -135,7 +144,7 @@ export default function Main() {
         <Button color={ActionButtonColor} onPress={() => handleChangeSignal()}>
           <Text color={ActionTextColor}>+/-</Text>
         </Button>
-        <Button color={ActionButtonColor}>
+        <Button color={ActionButtonColor} onPress={() => handlePercent()}>
           <Text color={ActionTextColor}>%</Text>
         </Button>
         <Button
