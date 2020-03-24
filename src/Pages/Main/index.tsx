@@ -97,7 +97,23 @@ export default function Main() {
     }
   }
 
-  function handleClean() {
+  function handlePercent(): void { }
+
+  function handleChangeSignal(): void {
+    if (calc.display.startsWith('-')) {
+      setCalc({
+        ...calc,
+        display: calc.display.slice(1, calc.display.length),
+      });
+    } else {
+      setCalc({
+        ...calc,
+        display: '-'.concat(calc.display),
+      });
+    }
+  }
+
+  function handleClean(): void {
     setCalc({
       waitingForOperand: true,
       replaceView: false,
@@ -116,7 +132,7 @@ export default function Main() {
         <Button color={ActionButtonColor} onPress={handleClean}>
           <Text color={ActionTextColor}>AC</Text>
         </Button>
-        <Button color={ActionButtonColor}>
+        <Button color={ActionButtonColor} onPress={() => handleChangeSignal()}>
           <Text color={ActionTextColor}>+/-</Text>
         </Button>
         <Button color={ActionButtonColor}>
